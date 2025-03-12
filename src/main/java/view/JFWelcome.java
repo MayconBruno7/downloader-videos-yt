@@ -30,11 +30,6 @@ public class JFWelcome extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
-            }
-        });
 
         jTextField1.setText("Bem vindo ao Downloader de videos do youtube");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
@@ -101,10 +96,6 @@ public class JFWelcome extends javax.swing.JFrame {
             frame.setVisible(true);
         });
     }//GEN-LAST:event_jButton1MouseClicked
-
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        this.setLocationRelativeTo(null);
-    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments
