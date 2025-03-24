@@ -55,11 +55,9 @@ public class JFInfoDownload extends javax.swing.JFrame {
 
         JLTipoDownload.setText("Tipo de Download: ");
 
-        JCTipoDownload.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Vídeo", "Música"}));
+        JCTipoDownload.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Selecione o tipo", "Vídeo", "Música"}));
 
         JLTipoDownload1.setText("Qualidade: ");
-
-        JCQualidade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"1080p", "720p", "MP3", "MP4"}));
 
         jLabel1.setText("Progresso: ");
 
@@ -69,122 +67,112 @@ public class JFInfoDownload extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 String url = JTlinkVideo.getText().trim();
-                String tipo = JCTipoDownload.getSelectedItem().toString();
-                String qualidade = JCQualidade.getSelectedItem().toString();
 
-                // Verificando se o link do vídeo foi informado
+                // Validação imediata antes de qualquer outra coisa
                 if (url.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Informe o link do vídeo!");
                     return;
                 }
 
-                // Exibindo o progresso do download e desabilitando o botão durante o processo
+                Object tipoSelecionado = JCTipoDownload.getSelectedItem();
+                if (tipoSelecionado == null || tipoSelecionado.toString().equals("Selecione o tipo")) {
+                    JOptionPane.showMessageDialog(null, "Informe o tipo de Download!");
+                    return;
+                }
+                String tipo = tipoSelecionado.toString();
+
+                Object qualidadeSelecionada = JCQualidade.getSelectedItem();
+                if (qualidadeSelecionada == null || qualidadeSelecionada.toString().equals("Selecione a qualidade")) {
+                    JOptionPane.showMessageDialog(null, "Informe a qualidade de download!");
+                    return;
+                }
+                String qualidade = qualidadeSelecionada.toString();
+
+                // Desativa botão e inicia progresso
                 progressBar.setIndeterminate(true);
                 JBbaixar.setEnabled(false);
 
                 SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        // Chama o método de download
-                        YtDlp.baixarVideo(url, qualidade, new YtDlp.DownloadListener() {
-                            @Override
-                            public void onOutput(String line) {
-                                publish(line);  // Atualiza a UI com a saída
+        if (tipo.equals("Vídeo")) {
+            YtDlp.baixarVideo(url, qualidade, new YtDlp.DownloadListener() {
+                @Override
+                public void onOutput(String line) {
+                    publish(line);
+                    // Verifique se a linha contém a porcentagem de progresso
+                    if (line.contains("%")) {
+                        // Usando expressão regular para extrair a porcentagem
+                        String percentString = line.replaceAll("[^0-9%]", ""); // Remove qualquer coisa que não seja número ou %
+                        
+                        // Verifique se a string tem o formato correto de porcentagem
+                        if (percentString.matches("\\d+%")) {
+                            try {
+                                // Remove o '%' e converte para inteiro
+                                int progress = Integer.parseInt(percentString.replace("%", ""));
+                                
+                                // Certifique-se de que o valor de progresso esteja dentro do intervalo válido de 0 a 100
+                                if (progress >= 0 && progress <= 100) {
+                                    progressBar.setIndeterminate(false);  // Desativa o modo indeterminado
+                                    progressBar.setValue(progress); // Atualiza a barra de progresso
+                                }
+                                publish(line); // Publica a linha para o SwingWorker
+                            } catch (NumberFormatException e) {
+                                // Caso ocorra erro na conversão, ignore ou trate da maneira que preferir
+                                System.err.println("Erro ao converter o progresso: " + e.getMessage());
                             }
-
-                            @Override
-                            public void onError(String error) {
-                                publish("Erro: " + error);
-                            }
-
-                            @Override
-                            public void onComplete(int exitCode) {
-                                publish("Download " + (exitCode == 0 ? "concluído" : "falhou"));
-                            }
-                        });
-                        return null;
+                        }
                     }
+                }
+
+                @Override
+                public void onError(String error) {
+                    System.out.println("Erro: " + error);
+                    publish("Erro: " + error);
+                }
+
+                @Override
+                public void onComplete(int exitCode) {
+                    if (exitCode == 0) {
+                        publish("Download concluído com sucesso!");
+                    } else {
+                        publish("Download falhou!");
+                    }
+                }
+            });
+        }
+        return null;
+    }
 
                     @Override
                     protected void process(java.util.List<String> chunks) {
-                        for (String chunk : chunks) {
-                            // Atualiza a barra de progresso ou log na interface gráfica
-                            progressBar.setIndeterminate(false);
-                            progressBar.setValue(progressBar.getValue() + 10);  // Ajuste conforme necessário
+                        for (String line : chunks) {
+                            System.out.println(line); // Aqui você pode adicionar uma área de log se quiser
                         }
                     }
 
                     @Override
                     protected void done() {
-                        // Finaliza a ação após o download
+                        progressBar.setIndeterminate(false);
                         JBbaixar.setEnabled(true);
+                        JOptionPane.showMessageDialog(null, "Processo finalizado.");
                     }
                 };
                 worker.execute();
+            }
+        });
 
-                try {
-                    if (tipo.equals("Vídeo")) {
-                        // Baixa vídeo e áudio, mesclando-os em um único arquivo MP4
-                        YtDlp.baixarVideo(url, qualidade, new YtDlp.DownloadListener() {
-                            @Override
-                            public void onOutput(String line) {
-                                System.out.println(line);  // Imprime a saída do processo no console
-                            }
+        JCTipoDownload.addActionListener(e -> {
+            String tipoSelecionado = (String) JCTipoDownload.getSelectedItem();
 
-                            @Override
-                            public void onError(String error) {
-                                System.out.println("Erro: " + error);
-                                JOptionPane.showMessageDialog(null, "Erro ao executar o download: " + error);
-                                progressBar.setIndeterminate(false);
-                                JBbaixar.setEnabled(true);
-                            }
+            if (tipoSelecionado != null) {
+                System.out.println("Tipo de download selecionado: " + tipoSelecionado);
 
-                            @Override
-                            public void onComplete(int exitCode) {
-                                progressBar.setIndeterminate(false);
-                                JBbaixar.setEnabled(true);
-
-                                if (exitCode == 0) {
-                                    JOptionPane.showMessageDialog(null, "Download finalizado com sucesso!");
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Erro ao finalizar download. Código: " + exitCode);
-                                }
-                            }
-                        });
-                    } else if (tipo.equals("Música")) {
-                        // Baixa apenas o áudio em formato MP3
-                        YtDlp.baixarMusica(url, new YtDlp.DownloadListener() {
-                            @Override
-                            public void onOutput(String line) {
-                                System.out.println(line);
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                System.out.println("Erro: " + error);
-                                JOptionPane.showMessageDialog(null, "Erro ao executar o download: " + error);
-                                progressBar.setIndeterminate(false);
-                                JBbaixar.setEnabled(true);
-                            }
-
-                            @Override
-                            public void onComplete(int exitCode) {
-                                progressBar.setIndeterminate(false);
-                                JBbaixar.setEnabled(true);
-
-                                if (exitCode == 0) {
-                                    JOptionPane.showMessageDialog(null, "Download finalizado com sucesso!");
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Erro ao finalizar download. Código: " + exitCode);
-                                }
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Erro durante o processo de download!");
-                    progressBar.setIndeterminate(false);
-                    JBbaixar.setEnabled(true);
+                // Aqui você pode reagir ao tipo escolhido:
+                if (tipoSelecionado.equals("Vídeo")) {
+                    JCQualidade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Selecione a qualidade", "1080p", "720p"}));
+                } else if (tipoSelecionado.equals("Música")) {
+                    JCQualidade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Selecione a qualidade", "MP3"}));
                 }
             }
         });
