@@ -55,7 +55,7 @@ public class JFInfoDownload extends javax.swing.JFrame {
 
         JLTipoDownload.setText("Tipo de Download: ");
 
-        JCTipoDownload.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Vídeo", "Música", "Ambos"}));
+        JCTipoDownload.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Vídeo", "Música"}));
 
         JLTipoDownload1.setText("Qualidade: ");
 
@@ -123,7 +123,7 @@ public class JFInfoDownload extends javax.swing.JFrame {
                 worker.execute();
 
                 try {
-                    if (tipo.equals("Vídeo") || tipo.equals("Ambos")) {
+                    if (tipo.equals("Vídeo")) {
                         // Baixa vídeo e áudio, mesclando-os em um único arquivo MP4
                         YtDlp.baixarVideo(url, qualidade, new YtDlp.DownloadListener() {
                             @Override

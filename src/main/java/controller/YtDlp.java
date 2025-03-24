@@ -28,8 +28,8 @@ public class YtDlp {
 
         // Comando para baixar o vídeo
         String command = String.format(
-                "yt-dlp -f \"bestvideo[height<=%s]+bestaudio/best[height<=%s]\" --merge-output-format mp4 -o \"%s\" \"%s\"",
-                qualidade, qualidade, outputTemplate, url
+            "yt-dlp --hls-prefer-ffmpeg --restrict-filenames -f \"bestvideo[height<=%s]+bestaudio/best[height<=%s]\" --merge-output-format mp4 -o \"%s\" \"%s\"",
+            qualidade, qualidade, outputTemplate, url
         );
         executarComando(command, listener);
     }
@@ -46,9 +46,10 @@ public class YtDlp {
 
         // Comando para baixar a música
         String command = String.format(
-                "yt-dlp -x --audio-format mp3 -o \"%s\" \"%s\"",
-                outputTemplate, url
+            "yt-dlp -x --audio-format mp3 --hls-prefer-ffmpeg --restrict-filenames -o \"%s\" \"%s\"",
+            outputTemplate, url
         );
+
         executarComando(command, listener);
     }
 
