@@ -4,9 +4,7 @@ import controller.YtDlp;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.swing.SwingWorker;
 
 public class JFInfoDownload extends javax.swing.JFrame {
 
@@ -95,54 +93,52 @@ public class JFInfoDownload extends javax.swing.JFrame {
                 SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
                     @Override
                     protected Void doInBackground() throws Exception {
-        if (tipo.equals("Vídeo")) {
-            YtDlp.baixarVideo(url, qualidade, new YtDlp.DownloadListener() {
-                @Override
-                public void onOutput(String line) {
-                    publish(line);
-                    // Verifique se a linha contém a porcentagem de progresso
-                    if (line.contains("%")) {
-                        // Usando expressão regular para extrair a porcentagem
-                        String percentString = line.replaceAll("[^0-9%]", ""); // Remove qualquer coisa que não seja número ou %
-                        
-                        // Verifique se a string tem o formato correto de porcentagem
-                        if (percentString.matches("\\d+%")) {
-                            try {
-                                // Remove o '%' e converte para inteiro
-                                int progress = Integer.parseInt(percentString.replace("%", ""));
-                                
-                                // Certifique-se de que o valor de progresso esteja dentro do intervalo válido de 0 a 100
-                                if (progress >= 0 && progress <= 100) {
-                                    progressBar.setIndeterminate(false);  // Desativa o modo indeterminado
-                                    progressBar.setValue(progress); // Atualiza a barra de progresso
+                        if (tipo.equals("Vídeo")) {
+                            YtDlp.baixarVideo(url, qualidade, new YtDlp.DownloadListener() {
+                                @Override
+                                public void onOutput(String line) {
+                                    publish(line);
+                                    // Verifique se a linha contém a porcentagem de progresso
+                                    if (line.contains("%")) {
+                                        // Usando expressão regular para extrair a porcentagem
+                                        String percentString = line.replaceAll("[^0-9%]", ""); // Remove qualquer coisa que não seja número ou %
+
+                                        // Verifique se a string tem o formato correto de porcentagem
+                                        if (percentString.matches("\\d+%")) {
+                                            try {
+                                                // Remove o '%' e converte para inteiro
+                                                int progress = Integer.parseInt(percentString.replace("%", ""));
+
+                                                // Certifique-se de que o valor de progresso esteja dentro do intervalo válido de 0 a 100
+                                                if (progress >= 0 && progress <= 100) {
+                                                    progressBar.setIndeterminate(false);  // Desativa o modo indeterminado
+                                                    progressBar.setValue(progress); // Atualiza a barra de progresso
+                                                }
+                                            } catch (NumberFormatException e) {
+                                                // Caso ocorra erro na conversão, ignore ou trate da maneira que preferir
+                                                System.err.println("Erro ao converter o progresso: " + e.getMessage());
+                                            }
+                                        }
+                                    }
                                 }
-                                publish(line); // Publica a linha para o SwingWorker
-                            } catch (NumberFormatException e) {
-                                // Caso ocorra erro na conversão, ignore ou trate da maneira que preferir
-                                System.err.println("Erro ao converter o progresso: " + e.getMessage());
-                            }
+
+                                @Override
+                                public void onError(String error) {
+                                    publish("Erro: " + error);
+                                }
+
+                                @Override
+                                public void onComplete(int exitCode) {
+                                    if (exitCode == 0) {
+                                        publish("Download concluído com sucesso!");
+                                    } else {
+                                        publish("Download falhou!");
+                                    }
+                                }
+                            });
                         }
+                        return null;
                     }
-                }
-
-                @Override
-                public void onError(String error) {
-                    System.out.println("Erro: " + error);
-                    publish("Erro: " + error);
-                }
-
-                @Override
-                public void onComplete(int exitCode) {
-                    if (exitCode == 0) {
-                        publish("Download concluído com sucesso!");
-                    } else {
-                        publish("Download falhou!");
-                    }
-                }
-            });
-        }
-        return null;
-    }
 
                     @Override
                     protected void process(java.util.List<String> chunks) {
