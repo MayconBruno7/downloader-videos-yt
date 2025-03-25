@@ -1,3 +1,8 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+
 package view;
 
 import controller.YtDlp;
@@ -9,6 +14,10 @@ import javax.swing.SwingWorker;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
+/**
+ *
+ * @author maycon-linux
+ */
 public class JFInfoDownload extends javax.swing.JFrame {
 
     private String pastaDestino = FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
