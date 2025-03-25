@@ -32,7 +32,7 @@ public class YtDlp {
         executarComando(command, listener);
     }
     
-    public static void baixarMusica(String url, DownloadListener listener) {
+    public static void baixarMusica(String url, String tipoAudio, DownloadListener listener) {
 
         String downloadsPath = getDownloadsPath();
 
@@ -40,11 +40,13 @@ public class YtDlp {
         String outputTemplate = downloadsPath + "/maycon-downloader-videos-musicas-yt/%(title)s.%(ext)s";
 
         String command = String.format(
-            "yt-dlp -x --audio-format mp3 --hls-prefer-ffmpeg --restrict-filenames -o \"%s\" \"%s\"",
-            outputTemplate, url
+            "yt-dlp -x --audio-format %s --hls-prefer-ffmpeg --restrict-filenames -o \"%s\" \"%s\"",
+            tipoAudio.toLowerCase(),outputTemplate, url
 
         );
-        executarComando(command, listener);
+        
+        System.out.println(command);
+
     }
 
     private static void executarComando(String comando, DownloadListener listener) {
