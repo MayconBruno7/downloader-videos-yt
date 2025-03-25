@@ -17,6 +17,7 @@ public class JFWelcome extends javax.swing.JFrame {
     public JFWelcome() {
         initComponents();
         setLocationRelativeTo(null); 
+        setResizable(false);
     }
 
     /**
