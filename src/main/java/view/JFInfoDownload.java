@@ -28,6 +28,7 @@ public class JFInfoDownload extends javax.swing.JFrame {
     public JFInfoDownload() {
         initComponents();
         setLocationRelativeTo(null);
+        setResizable(false);
     }
 
     @SuppressWarnings("unchecked")
