@@ -25,8 +25,24 @@ public class YtDlp {
 
         // Comando para baixar o vídeo
         String command = String.format(
-            "yt-dlp --hls-prefer-ffmpeg --restrict-filenames -f \"bestvideo[height<=%s]+bestaudio/best[height<=%s]\" --merge-output-format mp4 -o \"%s\" \"%s\"",
+            "yt-dlp --hls-prefer-ffmpeg --restrict-filenames -f \"bv*[height<=%s]+ba/best[height<=%s]\" --merge-output-format mp4 -o \"%s\" \"%s\"",
             qualidade, qualidade, outputTemplate, url
+        );
+        System.out.println(command);
+        executarComando(command, listener);
+    }
+    
+    public static void baixarMusica(String url, DownloadListener listener) {
+
+        String downloadsPath = getDownloadsPath();
+
+        criarPasta(downloadsPath);
+        String outputTemplate = downloadsPath + "/maycon-downloader-videos-musicas-yt/%(title)s.%(ext)s";
+
+        String command = String.format(
+            "yt-dlp -x --audio-format mp3 --hls-prefer-ffmpeg --restrict-filenames -o \"%s\" \"%s\"",
+            outputTemplate, url
+
         );
         executarComando(command, listener);
     }

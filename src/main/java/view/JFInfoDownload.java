@@ -8,13 +8,13 @@ import javax.swing.SwingWorker;
 
 public class JFInfoDownload extends javax.swing.JFrame {
 
-    private String pastaDestino = System.getProperty("user.home"); // Padrão: pasta do usuário
+    private String pastaDestino = System.getProperty("user.home"); 
     private JLabel JLdiretorio;
     private JButton JBselecionarPasta;
 
     public JFInfoDownload() {
         initComponents();
-        setLocationRelativeTo(null); // Centraliza a janela
+        setLocationRelativeTo(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -94,7 +94,8 @@ public class JFInfoDownload extends javax.swing.JFrame {
                     @Override
                     protected Void doInBackground() throws Exception {
                         if (tipo.equals("Vídeo")) {
-                            YtDlp.baixarVideo(url, qualidade, new YtDlp.DownloadListener() {
+                            String qualidadeFormat = qualidade.replace(String.valueOf('p'), "");
+                            YtDlp.baixarVideo(url, qualidadeFormat, new YtDlp.DownloadListener() {
                                 @Override
                                 public void onOutput(String line) {
                                     publish(line);
@@ -136,7 +137,7 @@ public class JFInfoDownload extends javax.swing.JFrame {
                                     }
                                 }
                             });
-                        }
+                        } 
                         return null;
                     }
 
@@ -166,9 +167,9 @@ public class JFInfoDownload extends javax.swing.JFrame {
 
                 // Aqui você pode reagir ao tipo escolhido:
                 if (tipoSelecionado.equals("Vídeo")) {
-                    JCQualidade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Selecione a qualidade", "1080p", "720p"}));
+                    JCQualidade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Selecione a qualidade", "1080p", "720p", "144p"}));
                 } else if (tipoSelecionado.equals("Música")) {
-                    JCQualidade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Selecione a qualidade", "MP3"}));
+                    JCQualidade.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Selecione a qualidade", "MP3", "AAC", "OPUS", "M4A", "FLAC"}));
                 }
             }
         });
